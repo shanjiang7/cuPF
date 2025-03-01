@@ -496,12 +496,12 @@ add_nucl(float* ph, int* arg, int* nucl_status, int cnx, int cny, int cnz, float
         }
         else
         {
-            float T_cell = interp4Dtemperature(thm.T_3D, x[glob_i] - thm.X_mac[0], y[glob_j] - thm.Y_mac[0], z[glob_k] - thm.Z_mac[0], t - thm.t_mac[0], 
-                cP.Nx, cP.Ny, cP.Nz, cP.Nt, Dx, Dt);
-            float T_cell_dt = interp4Dtemperature(thm.T_3D, x[glob_i] - thm.X_mac[0], y[glob_j] - thm.Y_mac[0], z[glob_k] - thm.Z_mac[0], t+dt - thm.t_mac[0], 
-                cP.Nx, cP.Ny, cP.Nz, cP.Nt, Dx, Dt);                                        
-            float delT = - T_cell_dt;
-            float d_delT = T_cell - T_cell_dt;
+          //  float T_cell = interp4Dtemperature(thm.T_3D, x[glob_i] - thm.X_mac[0], y[glob_j] - thm.Y_mac[0], z[glob_k] - thm.Z_mac[0], t - thm.t_mac[0], 
+          //      cP.Nx, cP.Ny, cP.Nz, cP.Nt, Dx, Dt);
+          //  float T_cell_dt = interp4Dtemperature(thm.T_3D, x[glob_i] - thm.X_mac[0], y[glob_j] - thm.Y_mac[0], z[glob_k] - thm.Z_mac[0], t+dt - thm.t_mac[0], 
+          //      cP.Nx, cP.Ny, cP.Nz, cP.Nt, Dx, Dt);                                        
+            float delT = cP.underCoolingRate*1e6*(t+dt); //- T_cell_dt;
+            float d_delT = cP.underCoolingRate*1e6*dt; //T_cell - T_cell_dt;
             nuc_posb = nuncl_possibility(delT, d_delT, cP.nuc_Nmax);
         }
         
@@ -823,13 +823,13 @@ void APTPhaseField::evolve()
     if (designSetting->useLineConfig)
     {
         movingDomainManager->allocateMovingDomain(params.num_theta, fnz);
-        qois->calculateLineQoIs(params, movingDomainManager->cur_tip, alpha, 0, z, movingDomainManager->loss_area_host, movingDomainManager->move_count);
+       // qois->calculateLineQoIs(params, movingDomainManager->cur_tip, alpha, 0, z, movingDomainManager->loss_area_host, movingDomainManager->move_count);
     }
     else
     {
         if (designSetting->includeNucleation == false)
         {
-            qois->calculateQoIs(params, alpha, 0);
+        //    qois->calculateQoIs(params, alpha, 0);
         }
     }
     //params.Mt = 2;
@@ -881,11 +881,12 @@ void APTPhaseField::evolve()
 
         if (designSetting->useLineConfig)
         {
-            getLineQoIs(movingDomainManager);
-            if (movingDomainManager->samples==params.nts)
+	
+          //  getLineQoIs(movingDomainManager);
+          //  if (movingDomainManager->samples==params.nts)
             {
-                printf("sample all %d heights\n", params.nts);
-                break;
+          //      printf("sample all %d heights\n", params.nts);
+          //      break;
             }
             if ( (2*kt+2)%TIPP==0) 
             {
@@ -894,12 +895,14 @@ void APTPhaseField::evolve()
         }
         else
         {
+	/*
             if ((2*kt+2)%qoikts==0)
             {
                 APTcollect_PF<<< num_block_2d, blocksize_2d >>>(PFs_old, phi_old, alpha_m, active_args_old);
                 cudaMemcpy(alpha, alpha_m, length * sizeof(int),cudaMemcpyDeviceToHost); 
                 qois->calculateQoIs(params, alpha, (2*kt+2)/qoikts);
             }
+	*/
         }
 
         if ((2*kt+2)%fieldkts==0)

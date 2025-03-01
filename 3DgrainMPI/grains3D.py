@@ -267,7 +267,7 @@ if __name__ == '__main__':
     y = np.linspace(0-BC,Ly+BC,ny)
     z = np.linspace(0-BC,Lz+BC,nz)
     xx, yy, zz = np.meshgrid(x, y, z, indexing='ij')
-    
+    underCoolingRate = G*Rmax/1e6 
     therm = ThermalProfile([Lx, Ly, Lz], [G, Rmax, underCoolingRate], seed=seed)
     
     angle = 0

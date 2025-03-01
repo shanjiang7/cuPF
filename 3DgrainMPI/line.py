@@ -49,9 +49,10 @@ BC = Lx/(nx-3)
 top = 48
 z0 = 2
 r0 = 0.9*Lz
+x0 = 0
 
-G = 10
-Rmax = 2e6
+G = 1
+Rmax = 1e6
 underCoolingRate = 20
 V = 0
 
